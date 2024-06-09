@@ -164,6 +164,7 @@ def generate_image(job):
 #                "refresh_worker": True
 #            }
 
+    # put image in output because refiner is skipped.
     output = image
     image_urls = _save_and_upload_images(output, job['id'])
 
