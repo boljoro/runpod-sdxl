@@ -97,7 +97,7 @@ def make_scheduler(name, config):
         "KLMS": LMSDiscreteScheduler.from_config(config),
         "DDIM": DDIMScheduler.from_config(config),
         "K_EULER": EulerDiscreteScheduler.from_config(config),
-        "DPMSolverMultistep": DPMSolverMultistepScheduler.from_config(config),
+        "DPMSolverMultistep": DPMSolverMultistepScheduler.from_config(config, use_karras_sigmas=True),
     }[name]
 
 
@@ -149,21 +149,22 @@ def generate_image(job):
             generator=generator
         ).images
 
-        try:
-            output = MODELS.refiner(
-                prompt=job_input['prompt'],
-                num_inference_steps=job_input['refiner_inference_steps'],
-                strength=job_input['strength'],
-                image=image,
-                num_images_per_prompt=job_input['num_images'],
-                generator=generator
-            ).images
-        except RuntimeError as err:
-            return {
-                "error": f"RuntimeError: {err}, Stack Trace: {err.__traceback__}",
-                "refresh_worker": True
-            }
+#        try:
+#            output = MODELS.refiner(
+#                prompt=job_input['prompt'],
+#                num_inference_steps=job_input['refiner_inference_steps'],
+#                strength=job_input['strength'],
+#                image=image,
+#                num_images_per_prompt=job_input['num_images'],
+#                generator=generator
+#            ).images
+#        except RuntimeError as err:
+#            return {
+#                "error": f"RuntimeError: {err}, Stack Trace: {err.__traceback__}",
+#                "refresh_worker": True
+#            }
 
+    output = image
     image_urls = _save_and_upload_images(output, job['id'])
 
     results = {
